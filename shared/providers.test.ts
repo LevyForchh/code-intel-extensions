@@ -24,7 +24,7 @@ const loc2 = new sourcegraph.Location(new URL('http://test/2'), range1)
 const loc3 = new sourcegraph.Location(new URL('http://test/3'), range1)
 const loc4 = new sourcegraph.Location(new URL('http://test/4'), range1)
 const loc5 = new sourcegraph.Location(new URL('http://test/5'), range1)
-const loc6 = new sourcegraph.Location(new URL('http://test/6'), range1)
+// const loc6 = new sourcegraph.Location(new URL('http://test/6'), range1)
 const loc7 = new sourcegraph.Location(new URL('http://test/2'), range2) // overlapping URI
 const loc8 = new sourcegraph.Location(new URL('http://test/3'), range2) // overlapping URI
 const loc9 = new sourcegraph.Location(new URL('http://test/4'), range2) // overlapping URI
@@ -32,13 +32,14 @@ const loc9 = new sourcegraph.Location(new URL('http://test/4'), range2) // overl
 const hover1: sourcegraph.Hover = { contents: { value: 'test1' } }
 const hover2: sourcegraph.Hover = { contents: { value: 'test2' } }
 const hover3: sourcegraph.Hover = { contents: { value: 'test3' } }
-const hover4: sourcegraph.Hover = { contents: { value: 'test4' } }
+// const hover4: sourcegraph.Hover = { contents: { value: 'test4' } }
+const hover5: sourcegraph.Hover = { contents: { value: 'test5' } }
 
 describe('createDefinitionProvider', () => {
     it('uses LSIF definitions as source of truth', async () => {
         const result = createDefinitionProvider(
             () => asyncGeneratorFromValues([loc1, loc2]),
-            () => asyncGeneratorFromValues([loc5]),
+            () => asyncGeneratorFromValues([loc5])
         ).provideDefinition(doc, pos) as Observable<sourcegraph.Definition>
 
         assert.deepStrictEqual(await gatherValues(result), [loc1, loc2])
@@ -72,25 +73,6 @@ describe('createReferencesProvider', () => {
         assert.deepStrictEqual(await gatherValues(result), [
             [loc1, loc2],
             [loc1, loc2, loc3],
-        ])
-    })
-
-    it('supplements LSIF results with LSP results', async () => {
-        const result = createReferencesProvider(
-            () =>
-                asyncGeneratorFromValues([
-                    [loc1, loc2],
-                    [loc1, loc2, loc3],
-                ]),
-            () => asyncGeneratorFromValues([[loc6]]),
-        ).provideReferences(doc, pos, {
-            includeDeclaration: false,
-        }) as Observable<sourcegraph.Badged<sourcegraph.Location>[]>
-
-        assert.deepStrictEqual(await gatherValues(result), [
-            [loc1, loc2],
-            [loc1, loc2, loc3],
-            [loc1, loc2, loc3, loc4, loc5],
         ])
     })
 
@@ -144,7 +126,7 @@ describe('createHoverProvider', () => {
     it('uses LSIF definitions as source of truth', async () => {
         const result = createHoverProvider(
             () => asyncGeneratorFromValues([hover1, hover2]),
-            () => asyncGeneratorFromValues([hover4]),
+            () => asyncGeneratorFromValues([hover5])
         ).provideHover(doc, pos) as Observable<
             sourcegraph.Badged<sourcegraph.Hover>
         >
