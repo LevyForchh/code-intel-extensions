@@ -1,4 +1,4 @@
-import { NEVER, Observable } from 'rxjs'
+import { Observable } from 'rxjs'
 import { shareReplay } from 'rxjs/operators'
 import * as sourcegraph from 'sourcegraph'
 import { impreciseBadge } from './badges'
@@ -14,12 +14,6 @@ export interface Providers {
     definition: DefinitionProvider
     references: ReferencesProvider
     hover: HoverProvider
-}
-
-export interface SourcegraphProviders {
-    definition: sourcegraph.DefinitionProvider
-    references: sourcegraph.ReferenceProvider
-    hover: sourcegraph.HoverProvider
 }
 
 export type DefinitionProvider = (
@@ -44,105 +38,49 @@ export const noopProviders = {
     hover: noopAsyncGenerator,
 }
 
-export interface ProviderWrapper {
-    definition: DefinitionWrapper
-    references: ReferencesWrapper
-    hover: HoverWrapper
-}
-
-export type DefinitionWrapper = (
-    provider?: DefinitionProvider
-) => sourcegraph.DefinitionProvider
-
-export type ReferencesWrapper = (
-    provider?: ReferencesProvider
-) => sourcegraph.ReferenceProvider
-
-export type HoverWrapper = (
-    provider?: HoverProvider
-) => sourcegraph.HoverProvider
-
-export class NoopProviderWrapper implements ProviderWrapper {
-    public definition = (
-        provider?: DefinitionProvider
-    ): sourcegraph.DefinitionProvider => ({
-        provideDefinition: (
-            doc: sourcegraph.TextDocument,
-            pos: sourcegraph.Position
-        ) =>
-            provider
-                ? observableFromAsyncIterator(() => provider(doc, pos))
-                : NEVER,
-    })
-
-    public references = (
-        provider?: ReferencesProvider
-    ): sourcegraph.ReferenceProvider => ({
-        provideReferences: (
-            doc: sourcegraph.TextDocument,
-            pos: sourcegraph.Position,
-            ctx: sourcegraph.ReferenceContext
-        ) =>
-            provider
-                ? observableFromAsyncIterator(() => provider(doc, pos, ctx))
-                : NEVER,
-    })
-
-    public hover = (provider?: HoverProvider): sourcegraph.HoverProvider => ({
-        provideHover: (
-            doc: sourcegraph.TextDocument,
-            pos: sourcegraph.Position
-        ) =>
-            provider
-                ? observableFromAsyncIterator(() => provider(doc, pos))
-                : NEVER,
-    })
+export interface SourcegraphProviders {
+    definition: sourcegraph.DefinitionProvider
+    references: sourcegraph.ReferenceProvider
+    hover: sourcegraph.HoverProvider
 }
 
 /**
- * Creates a provider wrapper that decorates a given provider with LSIF and search-based behaviors.
+ * Creates a provider that combines LSIF and search-based behaviors.
  *
  * @param languageSpec The language spec used to provide search-based code intelligence.
  */
 export function createProviderWrapper(
     languageSpec: LanguageSpec,
     logger: Logger
-): ProviderWrapper {
+): SourcegraphProviders {
     // Create empty wrapped providers. Each provider will update the
     // appropriate field when they are fully wrapped, so this object
-    // always has the "active" providers.
+    // always has the "active" providers. This is used by the search
+    // providers to call "back up" to LSIF providers.
     const wrapped: Partial<SourcegraphProviders> = {}
 
     const lsifProviders = createLSIFProviders(logger)
     const searchProviders = createSearchProviders(languageSpec, wrapped)
 
+    wrapped.definition = createDefinitionProvider(
+        lsifProviders.definition,
+        searchProviders.definition
+    )
+
+    wrapped.references = createReferencesProvider(
+        lsifProviders.references,
+        searchProviders.references
+    )
+
+    wrapped.hover = createHoverProvider(
+        lsifProviders.hover,
+        searchProviders.hover
+    )
+
     return {
-        definition: () => {
-            const provider = createDefinitionProvider(
-                lsifProviders.definition,
-                searchProviders.definition
-            )
-            wrapped.definition = provider
-            return provider
-        },
-
-        references: () => {
-            const provider = createReferencesProvider(
-                lsifProviders.references,
-                searchProviders.references
-            )
-            wrapped.references = provider
-            return provider
-        },
-
-        hover: () => {
-            const provider = createHoverProvider(
-                lsifProviders.hover,
-                searchProviders.hover
-            )
-            wrapped.hover = provider
-            return provider
-        },
+        definition: wrapped.definition,
+        references: wrapped.references,
+        hover: wrapped.hover,
     }
 }
 

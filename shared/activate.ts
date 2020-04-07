@@ -33,18 +33,18 @@ export function activateCodeIntel(
     ctx.subscriptions.add(
         sourcegraph.languages.registerDefinitionProvider(
             selector,
-            wrapper.definition()
+            wrapper.definition
         )
     )
 
     ctx.subscriptions.add(
         sourcegraph.languages.registerReferenceProvider(
             selector,
-            wrapper.references()
+            wrapper.references
         )
     )
 
     ctx.subscriptions.add(
-        sourcegraph.languages.registerHoverProvider(selector, wrapper.hover())
+        sourcegraph.languages.registerHoverProvider(selector, wrapper.hover)
     )
 }
