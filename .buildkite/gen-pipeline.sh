@@ -34,11 +34,6 @@ icons=($(ls icons))
 langs=(`echo ${icons[@]%.*}`)
 
 for lang in ${langs[@]}; do
-    # Skip lsp-backed extensions
-    if [ "${lang}" = "go" ] || [ "${lang}" = "typescript" ]; then
-        continue
-    fi
-
 cat << EOF >> ${tmpfile}
   - command: ./.buildkite/gen-and-publish.sh "${lang}"
     label: ':${special_icons[$lang]:-$lang}: :rocket:'

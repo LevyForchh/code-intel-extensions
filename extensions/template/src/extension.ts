@@ -1,7 +1,6 @@
 import * as sourcegraph from 'sourcegraph'
 import { activateCodeIntel } from '../../../shared/activate'
 import { languageSpecs } from '../../../shared/language-specs/languages'
-import { LanguageSpec } from '../../../shared/language-specs/spec'
 import { languageID } from './language'
 
 /**
@@ -21,23 +20,10 @@ const activeLanguageSpecs =
  *
  * @param ctx The extension context.
  */
-export async function activate(
-    ctx?: sourcegraph.ExtensionContext
-): Promise<void> {
-    await Promise.all(activeLanguageSpecs.map(spec => activateSpec(spec, ctx)))
-}
-
-/**
- * Register providers on the extension host for the given language spec.
- *
- * @param spec The language spec.
- * @param ctx The extension context.
- */
-function activateSpec(
-    spec: LanguageSpec,
-    ctx?: sourcegraph.ExtensionContext
-): Promise<void> {
-    return activateCodeIntel(ctx, spec.fileExts.flatMap(createSelector), spec)
+export function activate(ctx?: sourcegraph.ExtensionContext): void {
+    for (const spec of activeLanguageSpecs) {
+        activateCodeIntel(ctx, spec.fileExts.flatMap(createSelector), spec)
+    }
 }
 
 function createSelector(ext: string): sourcegraph.DocumentSelector {
