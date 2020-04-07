@@ -120,7 +120,7 @@ export function createProviderWrapper(
         definition: () => {
             const provider = createDefinitionProvider(
                 lsifProviders.definition,
-                searchProviders.definition,
+                searchProviders.definition
             )
             wrapped.definition = provider
             return provider
@@ -129,7 +129,7 @@ export function createProviderWrapper(
         references: () => {
             const provider = createReferencesProvider(
                 lsifProviders.references,
-                searchProviders.references,
+                searchProviders.references
             )
             wrapped.references = provider
             return provider
@@ -138,7 +138,7 @@ export function createProviderWrapper(
         hover: () => {
             const provider = createHoverProvider(
                 lsifProviders.hover,
-                searchProviders.hover,
+                searchProviders.hover
             )
             wrapped.hover = provider
             return provider
@@ -154,7 +154,7 @@ export function createProviderWrapper(
  */
 export function createDefinitionProvider(
     lsifProvider: DefinitionProvider,
-    searchProvider: DefinitionProvider,
+    searchProvider: DefinitionProvider
 ): sourcegraph.DefinitionProvider {
     return {
         provideDefinition: wrapProvider(async function*(
@@ -196,7 +196,7 @@ export function createDefinitionProvider(
  */
 export function createReferencesProvider(
     lsifProvider: ReferencesProvider,
-    searchProvider: ReferencesProvider,
+    searchProvider: ReferencesProvider
 ): sourcegraph.ReferenceProvider {
     // Gets an opaque value that is the same for all locations
     // within a file but different from other files.
@@ -254,7 +254,7 @@ export function createReferencesProvider(
  */
 export function createHoverProvider(
     lsifProvider: HoverProvider,
-    searchProvider: HoverProvider,
+    searchProvider: HoverProvider
 ): sourcegraph.HoverProvider {
     return {
         provideHover: wrapProvider(async function*(
