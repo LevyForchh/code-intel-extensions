@@ -33,24 +33,12 @@ const hover1: sourcegraph.Hover = { contents: { value: 'test1' } }
 const hover2: sourcegraph.Hover = { contents: { value: 'test2' } }
 const hover3: sourcegraph.Hover = { contents: { value: 'test3' } }
 const hover4: sourcegraph.Hover = { contents: { value: 'test4' } }
-const hover5: sourcegraph.Hover = { contents: { value: 'test5' } }
 
 describe('createDefinitionProvider', () => {
     it('uses LSIF definitions as source of truth', async () => {
         const result = createDefinitionProvider(
             () => asyncGeneratorFromValues([loc1, loc2]),
             () => asyncGeneratorFromValues([loc5]),
-            () => asyncGeneratorFromValues([loc3, loc4])
-        ).provideDefinition(doc, pos) as Observable<sourcegraph.Definition>
-
-        assert.deepStrictEqual(await gatherValues(result), [loc1, loc2])
-    })
-
-    it('falls back to LSP when LSIF results are not found', async () => {
-        const result = createDefinitionProvider(
-            () => asyncGeneratorFromValues([]),
-            () => asyncGeneratorFromValues([loc3]),
-            () => asyncGeneratorFromValues([loc1, loc2])
         ).provideDefinition(doc, pos) as Observable<sourcegraph.Definition>
 
         assert.deepStrictEqual(await gatherValues(result), [loc1, loc2])
@@ -87,25 +75,6 @@ describe('createReferencesProvider', () => {
         ])
     })
 
-    it('falls back to LSP when LSIF results are not found', async () => {
-        const result = createReferencesProvider(
-            () => asyncGeneratorFromValues([]),
-            () => asyncGeneratorFromValues([]),
-            () =>
-                asyncGeneratorFromValues([
-                    [loc1, loc2],
-                    [loc1, loc2, loc3],
-                ])
-        ).provideReferences(doc, pos, {
-            includeDeclaration: false,
-        }) as Observable<sourcegraph.Badged<sourcegraph.Location>[]>
-
-        assert.deepStrictEqual(await gatherValues(result), [
-            [loc1, loc2],
-            [loc1, loc2, loc3],
-        ])
-    })
-
     it('supplements LSIF results with LSP results', async () => {
         const result = createReferencesProvider(
             () =>
@@ -114,7 +83,6 @@ describe('createReferencesProvider', () => {
                     [loc1, loc2, loc3],
                 ]),
             () => asyncGeneratorFromValues([[loc6]]),
-            () => asyncGeneratorFromValues([[loc4, loc5]])
         ).provideReferences(doc, pos, {
             includeDeclaration: false,
         }) as Observable<sourcegraph.Badged<sourcegraph.Location>[]>
@@ -176,20 +144,7 @@ describe('createHoverProvider', () => {
     it('uses LSIF definitions as source of truth', async () => {
         const result = createHoverProvider(
             () => asyncGeneratorFromValues([hover1, hover2]),
-            () => asyncGeneratorFromValues([hover5]),
-            () => asyncGeneratorFromValues([hover3, hover4])
-        ).provideHover(doc, pos) as Observable<
-            sourcegraph.Badged<sourcegraph.Hover>
-        >
-
-        assert.deepStrictEqual(await gatherValues(result), [hover1, hover2])
-    })
-
-    it('falls back to LSP when LSIF results are not found', async () => {
-        const result = createHoverProvider(
-            () => asyncGeneratorFromValues([]),
-            () => asyncGeneratorFromValues([hover3]),
-            () => asyncGeneratorFromValues([hover1, hover2])
+            () => asyncGeneratorFromValues([hover4]),
         ).provideHover(doc, pos) as Observable<
             sourcegraph.Badged<sourcegraph.Hover>
         >
