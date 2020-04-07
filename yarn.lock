@@ -927,13 +927,6 @@
   resolved "https://registry.yarnpkg.com/@sourcegraph/tsconfig/-/tsconfig-4.0.1.tgz#5965ec41771d2ac5b23b6e0d919cee3e70485840"
   integrity sha512-G/xsejsR84G5dj3kHJ7svKBo9E5tWl96rUHKP94Y2UDtA7BzUhAYbieM+b9ZUpIRt66h3+MlYbG5HK4UI2zDzw==
 
-"@sourcegraph/vscode-ws-jsonrpc@0.0.3-fork":
-  version "0.0.3-fork"
-  resolved "https://registry.yarnpkg.com/@sourcegraph/vscode-ws-jsonrpc/-/vscode-ws-jsonrpc-0.0.3-fork.tgz#83728a14616ef0587298e7849d960b61853a9954"
-  integrity sha512-EJLq/ni66glk3xYyOZtUIEbjTCw8kMI6RvO0YQtPd+4um2+aTSM1LfN4NrsiVrRkG7EG/U2OkFlKqT8mGo6w4Q==
-  dependencies:
-    vscode-jsonrpc "^4.0.0"
-
 "@tootallnate/once@1":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.0.0.tgz#9c13c2574c92d4503b005feca8f2e16cc1611506"

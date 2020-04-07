@@ -23,7 +23,6 @@
     "publish": "yarn run ts-node -P tsconfig.json ./dev/scripts/publish.ts"
   },
   "dependencies": {
-    "@sourcegraph/vscode-ws-jsonrpc": "0.0.3-fork",
     "delay": "^4.3.0",
     "ix": "^3.0.2",
     "js-base64": "^2.5.2",
